@@ -1,26 +1,21 @@
-name: .NET Core CI
+name: 'Run App Nick Pham'  
 
 on: [push, pull_request]
 
 jobs:
-  build:
-
+  check-bats-version:
     runs-on: ubuntu-latest
-
     steps:
-    - name: Checkout repository
-      uses: actions/checkout@v3
-
-    - name: Setup .NET SDK
-      uses: actions/setup-dotnet@v3
-      with:
-        dotnet-version: '6.0.x'  # Change this if you're using .NET 7/8
-
-    - name: Restore dependencies
-      run: dotnet restore
-
-    - name: Build project
-      run: dotnet build --no-restore
-
-    - name: Run tests
-      run: dotnet test --no-build --verbosity normal
+      - uses: actions/checkout@v2
+      - uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: '5.0.301'
+      - uses: nuget/setup-nuget@v1
+      - name: Nuget Restore
+        run: nuget restore GithubActions.sln
+      - name: Install dependencies
+        run: dotnet restore GithubActions.sln
+      - name: Build
+        run: msbuild /p:Configuration=Release GithubActions.sln
+      - name: Run Unit Tests
+        run: mono ./packages/NUnit.ConsoleRunner.*/tools/nunit3-console.exe ./Tests/bin/Release/Tests.dll
